@@ -101,6 +101,12 @@ public interface KotlinLangVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPrimary(KotlinLangParser.PrimaryContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link KotlinLangParser#unaryExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUnaryExpr(KotlinLangParser.UnaryExprContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link KotlinLangParser#prefixOp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

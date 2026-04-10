@@ -10,6 +10,10 @@ FOR: 'for';
 RETURN: 'return';
 RANGE: '..';
 
+SAFE_CALL: '?.';
+ELVIS: '?:';
+NOT_NULL: '!!';
+
 NUMBER: [0-9]+ ('.' [0-9]+)?;
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 STRING: '"' .*? '"';
@@ -43,7 +47,8 @@ stmt: assignment ';'?
     | forStmt
     | returnStmt
     | 'break' ';'?
-    | 'continue' ';'?;
+    | 'continue' ';'?
+    ;
 
 assignment: ID '=' expr;
 
@@ -53,22 +58,29 @@ whileStmt: WHILE '(' expr ')' (stmt | block);
 forStmt: FOR '(' ID 'in' expr ')' (stmt | block);
 
 // Приорететы от высшего к низшему
-expr: primary
+expr: unaryExpr
     | expr (MUL | DIV | REM) expr
     | expr (ADD | SUB) expr
     | expr RANGE expr
     | expr (GT | GE | LT | LE) expr
     | expr (EQ | NE) expr
     | expr '&&' expr
-    | expr '||' expr;
+    | expr '||' expr
+    | expr ELVIS expr
+    ;
 
 primary: NUMBER
     | STRING
     | ID '(' (expr (',' expr)*)? ')' // Вызов функции
     | ID
-    | '(' expr ')'
-    | prefixOp primary
-    | primary postfixOp;
+    | '(' expr ')';
+
+unaryExpr: primary NOT_NULL
+         | primary SAFE_CALL ID
+         | prefixOp unaryExpr
+         | primary postfixOp
+         | primary
+         ;
 
 prefixOp: '++' | '--' | '-' | '!';
 postfixOp: '++' | '--';

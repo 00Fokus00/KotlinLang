@@ -158,6 +158,16 @@ public interface KotlinLangListener extends ParseTreeListener {
 	 */
 	void exitPrimary(KotlinLangParser.PrimaryContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link KotlinLangParser#unaryExpr}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnaryExpr(KotlinLangParser.UnaryExprContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link KotlinLangParser#unaryExpr}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnaryExpr(KotlinLangParser.UnaryExprContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link KotlinLangParser#prefixOp}.
 	 * @param ctx the parse tree
 	 */

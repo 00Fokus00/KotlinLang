@@ -21,6 +21,12 @@ public class AstBuilder extends KotlinLangBaseVisitor<AstNode> {
     }
 
     @Override
+    public AstNode visitStmt(KotlinLangParser.StmtContext ctx) {
+        // Игнорируем ';'
+        return visit(ctx.getChild(0));
+    }
+
+    @Override
     public AstNode visitPropertyDecl(KotlinLangParser.PropertyDeclContext ctx) {
         boolean isMutable = ctx.VAR() != null;
         String name = ctx.ID().getText();
@@ -43,6 +49,13 @@ public class AstBuilder extends KotlinLangBaseVisitor<AstNode> {
     @Override
     public AstNode visitFuncParam(KotlinLangParser.FuncParamContext ctx) {
         return new ParameterNode(ctx.ID().getText(), ctx.type().getText());
+    }
+
+    @Override
+    public AstNode visitAssignment(KotlinLangParser.AssignmentContext ctx) {
+        String name = ctx.ID().getText();
+        ExprNode value = (ExprNode) visit(ctx.expr());
+        return new AssignmentNode(name, value);
     }
 
     @Override
@@ -84,6 +97,14 @@ public class AstBuilder extends KotlinLangBaseVisitor<AstNode> {
     public AstNode visitExpr(KotlinLangParser.ExprContext ctx) {
         if (ctx.getChildCount() == 3) {
             String op = ctx.getChild(1).getText();
+
+            if (op.equals("?:")) {
+                return new ElvisNode(
+                        (ExprNode) visit(ctx.expr(0)),
+                        (ExprNode) visit(ctx.expr(1))
+                );
+            }
+
             if (op.matches("[+\\-*/%><=!&|]+") || op.equals("..")) {
                 return new BinOpNode(
                         op,
@@ -92,7 +113,40 @@ public class AstBuilder extends KotlinLangBaseVisitor<AstNode> {
                 );
             }
         }
-        return visit(ctx.primary());
+        return visit(ctx.unaryExpr());
+    }
+
+    @Override
+    public AstNode visitUnaryExpr(KotlinLangParser.UnaryExprContext ctx) {
+
+        if (ctx.NOT_NULL() != null) {
+            ExprNode target = (ExprNode) visit(ctx.primary());
+            return new UnaryOpNode("!!", target, true);
+        }
+
+        if (ctx.SAFE_CALL() != null) {
+            ExprNode target = (ExprNode) visit(ctx.primary());
+            String member = ctx.ID().getText();
+            return new SafeCallNode(target, member);
+        }
+
+        if (ctx.prefixOp() != null) {
+            String op = ctx.prefixOp().getText();
+            ExprNode target = (ExprNode) visit(ctx.unaryExpr());
+            return new UnaryOpNode(op, target, false);
+        }
+
+        if (ctx.postfixOp() != null) {
+            String op = ctx.postfixOp().getText();
+            ExprNode target = (ExprNode) visit(ctx.primary());
+            return new UnaryOpNode(op, target, true);
+        }
+
+        if (ctx.primary() != null) {
+            return visit(ctx.primary());
+        }
+
+        return null;
     }
 
     @Override
@@ -109,18 +163,6 @@ public class AstBuilder extends KotlinLangBaseVisitor<AstNode> {
         }
 
         if (ctx.ID() != null && ctx.getChildCount() == 1) return new IdentNode(ctx.ID().getText());
-
-        if (ctx.prefixOp() != null) {
-            String op = ctx.prefixOp().getText();
-            ExprNode target = (ExprNode) visit(ctx.primary());
-            return new UnaryOpNode(op, target, false);
-        }
-
-        if (ctx.postfixOp() != null) {
-            String op = ctx.postfixOp().getText();
-            ExprNode target = (ExprNode) visit(ctx.primary());
-            return new UnaryOpNode(op, target, true);
-        }
 
         if (ctx.expr().size() == 1) return visit(ctx.expr(0)); // Скобки (expr)
 

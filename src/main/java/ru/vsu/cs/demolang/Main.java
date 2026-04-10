@@ -9,7 +9,9 @@ public class Main {
         String prog = """
         val x: Int = 10;
         var y = 20;
-
+        y = 13;
+        
+        y++;
         
         fun sum(a: Int, b: Int): Int {
             return a + b
@@ -20,8 +22,10 @@ public class Main {
         }
 
         for (i in 1..10) {
-            print(i)
+            print(i);
         }
+        
+        val name = user?.login ?: "Guest"
     """;
 
 

@@ -114,6 +114,21 @@ class UnaryOpNode implements ExprNode {
     }
 }
 
+class ElvisNode implements ExprNode {
+    private final ExprNode left, right;
+    public ElvisNode(ExprNode left, ExprNode right) { this.left = left; this.right = right; }
+    @Override public List<AstNode> getChilds() { return Arrays.asList(left, right); }
+    @Override public String toString() { return "op: ?:"; }
+}
+
+class SafeCallNode implements ExprNode {
+    private final ExprNode target;
+    private final String member;
+    public SafeCallNode(ExprNode target, String member) { this.target = target; this.member = member; }
+    @Override public List<AstNode> getChilds() { return Collections.singletonList(target); }
+    @Override public String toString() { return "safe call: ." + member; }
+}
+
 // Объявления
 class PropertyNode implements StmtNode {
     private final boolean isMutable;
@@ -137,7 +152,7 @@ class PropertyNode implements StmtNode {
     }
 }
 
-class ParameterNode implements AstNode {
+class ParameterNode implements StmtNode {
     private final String name;
     private final String type;
 
@@ -148,6 +163,27 @@ class ParameterNode implements AstNode {
 
     @Override
     public String toString() { return name + ": " + type; }
+}
+
+class AssignmentNode implements StmtNode {
+    private final String name;
+    private final ExprNode value;
+
+    public AssignmentNode(String name, ExprNode value) {
+        this.name = name;
+        this.value = value;
+    }
+
+    @Override
+    public List<AstNode> getChilds() {
+        // У присваивания один ребенок — это то, что мы присваиваем
+        return Collections.singletonList(value);
+    }
+
+    @Override
+    public String toString() {
+        return "assign: " + name;
+    }
 }
 
 class FuncNode implements StmtNode {
