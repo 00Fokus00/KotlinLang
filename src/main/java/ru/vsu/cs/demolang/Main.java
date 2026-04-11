@@ -10,6 +10,7 @@ public class Main {
         val x: Int = 10;
         var y = 20;
         y = 13;
+        //y = ;
         
         y++;
         
