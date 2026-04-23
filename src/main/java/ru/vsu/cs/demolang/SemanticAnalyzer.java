@@ -2,7 +2,6 @@ package ru.vsu.cs.demolang;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class SemanticAnalyzer {
     private SymbolTable currentScope = new SymbolTable(null);

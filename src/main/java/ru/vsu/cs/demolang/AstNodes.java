@@ -297,15 +297,6 @@ class ForNode implements StmtNode {
     }
 }
 
-class StmtListNode implements StmtNode {
-    private final List<StmtNode> stmts;
-    public StmtListNode(List<StmtNode> stmts) { this.stmts = stmts; }
-    @Override
-    public List<AstNode> getChilds() { return new ArrayList<>(stmts); }
-    @Override
-    public String toString() { return "block"; }
-}
-
 @Data
 class ReturnNode implements StmtNode {
     private final ExprNode value;

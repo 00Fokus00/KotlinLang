@@ -2,17 +2,17 @@ package ru.vsu.cs.demolang;
 
 public class Main {
     public static void main(String[] args) {
-        String prog = """
+        /*String prog = """
         val x: Boolean = false;
-                
-        var y = 20; 
+
+        var y = 20;
         y = 13;
         //y = ;
-        
+
         var z: String = "Hello World"
-        
+
         y++;
-        
+
         fun sum(a: Int, b: Int): Int {
             return a + b
         }
@@ -23,10 +23,17 @@ public class Main {
 
         for (i in 1..10) {
             print(i);
-        }       
-        
+        }
+
         val name = user?.login ?: "Guest"
-    """;
+    """;*/
+
+        String prog = """
+        fun test() {
+            val localX = 5;
+        }
+        print(localX);
+        """;
 
 
         StmtListNode result = Parser.parse(prog);
