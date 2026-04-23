@@ -154,6 +154,9 @@ public class AstBuilder extends KotlinLangBaseVisitor<AstNode> {
         if (ctx.NUMBER() != null) return new NumNode(ctx.NUMBER().getText());
         if (ctx.STRING() != null) return new StringNode(ctx.STRING().getText());
 
+        if (ctx.TRUE() != null) return new BoolNode(true);
+        if (ctx.FALSE() != null) return new BoolNode(false);
+
         // Вызов функции
         if (ctx.ID() != null && ctx.getChildCount() > 1 && ctx.getChild(1).getText().equals("(")) {
             List<ExprNode> args = ctx.expr().stream()

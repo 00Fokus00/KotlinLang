@@ -1,5 +1,8 @@
 package ru.vsu.cs.demolang;
 
+import lombok.Data;
+import lombok.Getter;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,6 +51,7 @@ class NumNode implements ExprNode {
     public String toString() { return "num: " + value; }
 }
 
+@Data
 class IdentNode implements ExprNode {
     private final String name;
     public IdentNode(String name) { this.name = name; }
@@ -62,7 +66,25 @@ class StringNode implements ExprNode {
     public String toString() { return "str: " + value; }
 }
 
+class BoolNode implements ExprNode {
+    private final boolean value;
+
+    public BoolNode(boolean value) {
+        this.value = value;
+    }
+
+    public boolean getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return "bool: " + value;
+    }
+}
+
 // Выражения
+@Data
 class BinOpNode implements ExprNode {
     private final String op;
     private final ExprNode left, right;
@@ -77,6 +99,7 @@ class BinOpNode implements ExprNode {
     public String toString() { return "bin_op: " + op; }
 }
 
+@Data
 class CallNode implements ExprNode {
     private final String name;
     private final List<ExprNode> args;
@@ -92,6 +115,7 @@ class CallNode implements ExprNode {
     public String toString() { return "call: " + name; }
 }
 
+@Data
 class UnaryOpNode implements ExprNode {
     private final String op;
     private final ExprNode target;
@@ -130,6 +154,7 @@ class SafeCallNode implements ExprNode {
 }
 
 // Объявления
+@Data
 class PropertyNode implements StmtNode {
     private final boolean isMutable;
     private final String name;
@@ -152,6 +177,7 @@ class PropertyNode implements StmtNode {
     }
 }
 
+@Data
 class ParameterNode implements StmtNode {
     private final String name;
     private final String type;
@@ -165,6 +191,7 @@ class ParameterNode implements StmtNode {
     public String toString() { return name + ": " + type; }
 }
 
+@Data
 class AssignmentNode implements StmtNode {
     private final String name;
     private final ExprNode value;
@@ -186,6 +213,7 @@ class AssignmentNode implements StmtNode {
     }
 }
 
+@Data
 class FuncNode implements StmtNode {
     private final String name;
     private final List<ParameterNode> params;
@@ -208,6 +236,7 @@ class FuncNode implements StmtNode {
 }
 
 // Управляющие конструкции
+@Data
 class IfNode implements StmtNode {
     private final ExprNode condition;
     private final StmtNode thenBlock, elseBlock;
@@ -231,18 +260,21 @@ class IfNode implements StmtNode {
     public String toString() { return "if"; }
 }
 
+@Data
 class WhileNode implements StmtNode {
     private final ExprNode condition;
     private final StmtNode body;
 
     public WhileNode(ExprNode condition, StmtNode body) {
-        this.condition = condition; this.body = body;
+        this.condition = condition;
+        this.body = body;
     }
 
     @Override public List<AstNode> getChilds() { return Arrays.asList(condition, body); }
     @Override public String toString() { return "while"; }
 }
 
+@Data
 class ForNode implements StmtNode {
     private final String iteratorName;
     private final ExprNode range;
@@ -268,15 +300,20 @@ class ForNode implements StmtNode {
 class StmtListNode implements StmtNode {
     private final List<StmtNode> stmts;
     public StmtListNode(List<StmtNode> stmts) { this.stmts = stmts; }
-    @Override public List<AstNode> getChilds() { return new ArrayList<>(stmts); }
-    @Override public String toString() { return "block"; }
+    @Override
+    public List<AstNode> getChilds() { return new ArrayList<>(stmts); }
+    @Override
+    public String toString() { return "block"; }
 }
 
+@Data
 class ReturnNode implements StmtNode {
     private final ExprNode value;
     public ReturnNode(ExprNode value) { this.value = value; }
-    @Override public List<AstNode> getChilds() {
+    @Override
+    public List<AstNode> getChilds() {
         return value != null ? Collections.singletonList(value) : Collections.emptyList();
     }
-    @Override public String toString() { return "return"; }
+    @Override
+    public String toString() { return "return"; }
 }

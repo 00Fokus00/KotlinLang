@@ -1,16 +1,15 @@
 package ru.vsu.cs.demolang;
 
-import ru.vsu.cs.demolang.AstNode;
-import ru.vsu.cs.demolang.StmtListNode;
-import ru.vsu.cs.demolang.Parser;
-
 public class Main {
     public static void main(String[] args) {
         String prog = """
-        val x: Int = 10;
-        var y = 20;
+        val x: Boolean = false;
+                
+        var y = 20; 
         y = 13;
         //y = ;
+        
+        var z: String = "Hello World"
         
         y++;
         
@@ -18,21 +17,35 @@ public class Main {
             return a + b
         }
 
-        if (!x < y) {
+        if (!x) {
             print(sum(x, y))
         }
 
         for (i in 1..10) {
             print(i);
-        }
+        }       
         
         val name = user?.login ?: "Guest"
     """;
 
 
         StmtListNode result = Parser.parse(prog);
-        for (String line : result.getTree()) {
-            System.out.println(line);
+
+//        for (String line : result.getTree()) {
+//            System.out.println(line);
+//        }
+
+        SemanticAnalyzer analyzer = new SemanticAnalyzer();
+        try {
+            analyzer.registerBuiltIn(); // Добавляем print, println и т.д.
+            analyzer.analyze(result);
+            System.out.println("Семантический анализ завершен успешно.");
+
+            for (String line : result.getTree()) {
+                System.out.println(line);
+            }
+        } catch (SemanticException e) {
+            System.err.println("Ошибка семантики: " + e.getMessage());
         }
     }
 }

@@ -15,6 +15,8 @@ ELVIS: '?:';
 NOT_NULL: '!!';
 
 NUMBER: [0-9]+ ('.' [0-9]+)?;
+TRUE: 'true';
+FALSE: 'false';
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 STRING: '"' .*? '"';
 
@@ -71,6 +73,8 @@ expr: unaryExpr
 
 primary: NUMBER
     | STRING
+    | TRUE
+    | FALSE
     | ID '(' (expr (',' expr)*)? ')' // Вызов функции
     | ID
     | '(' expr ')';
