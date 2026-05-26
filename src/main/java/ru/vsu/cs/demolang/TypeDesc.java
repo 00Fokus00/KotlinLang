@@ -9,7 +9,7 @@ import java.util.Objects;
 public class TypeDesc {
 
     public enum BaseType {
-        VOID, INT, FLOAT, STRING, BOOL, FUNCTION, OBJECT
+        VOID, INT, FLOAT, STRING, BOOL, FUNCTION, OBJECT, UNIT
     }
 
     private final BaseType baseType;
@@ -23,6 +23,7 @@ public class TypeDesc {
     public static final TypeDesc FLOAT = new TypeDesc(BaseType.FLOAT);
     public static final TypeDesc STRING = new TypeDesc(BaseType.STRING);
     public static final TypeDesc BOOL = new TypeDesc(BaseType.BOOL);
+    public static final TypeDesc UNIT = new TypeDesc(BaseType.UNIT);
 
     private TypeDesc(BaseType baseType) {
         this(baseType, null, null);

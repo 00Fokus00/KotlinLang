@@ -2,23 +2,24 @@ package ru.vsu.cs.demolang;
 
 public class Main {
     public static void main(String[] args) {
-        /*String prog = """
+        String prog = """
         val x: Boolean = false;
 
         var y = 20;
-        y = 13;
-        //y = ;
+        val b: Int = 13;
+        y = b;
 
         var z: String = "Hello World"
 
         y++;
 
-        fun sum(a: Int, b: Int): Int {
-            return a + b
+        fun compute(a: Int, b: Int): Int {
+            var h = 2;
+            h = 3;
         }
 
         if (!x) {
-            print(sum(x, y))
+            print(sum(b, y))
         }
 
         for (i in 1..10) {
@@ -26,15 +27,27 @@ public class Main {
         }
 
         val name = user?.login ?: "Guest"
-    """;*/
+    """;
 
-        String prog = """
-        fun test() {
-            val localX = 5;
-        }
-        print(localX);
-        """;
+//        String prog = """
+//            val x: Boolean = false;
+//            var y = 20;
+//
+//            if (!x) {
+//                sum(x, y)
+//            }
+//        """;
 
+//        String prog = """
+//            val globalX: Int = 10;
+//            var globalY: Float = 3.14;
+//
+//            fun compute(param1: Int, param2: Float) {
+//                var A = globalY;
+//                var B: Float = 1.1;
+//                val C: Boolean = true;
+//            }
+//        """;
 
         StmtListNode result = Parser.parse(prog);
 
@@ -44,7 +57,7 @@ public class Main {
 
         SemanticAnalyzer analyzer = new SemanticAnalyzer();
         try {
-            analyzer.registerBuiltIn(); // Добавляем print, println и т.д.
+            analyzer.registerBuiltIn(); // регистрируем функции
             analyzer.analyze(result);
             System.out.println("Семантический анализ завершен успешно.");
 

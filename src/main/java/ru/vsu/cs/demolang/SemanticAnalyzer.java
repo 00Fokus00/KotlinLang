@@ -9,8 +9,9 @@ public class SemanticAnalyzer {
 
     public void analyze(AstNode node) {
         if (node instanceof StmtListNode) {
-            currentScope = new SymbolTable(currentScope); // Новый блок
-            for (AstNode child : node.getChilds()) analyze(child);
+            for (AstNode child : node.getChilds()) {
+                analyze(child);
+            }
             currentScope = currentScope.getParent();
         }
         else if (node instanceof PropertyNode) {
@@ -37,39 +38,50 @@ public class SemanticAnalyzer {
         else {
             for (AstNode child : node.getChilds()) analyze(child);
         }
+
     }
 
     private void checkCycle(AstNode node) {
+        SymbolTable oldScope = currentScope;
+        currentScope = new SymbolTable(oldScope);
+
         if (node instanceof WhileNode whileNode) {
             TypeDesc condType = inferType(whileNode.getCondition());
+
             if (!condType.equals(TypeDesc.BOOL)) {
                 throw new SemanticException("Условие в 'while' должно быть Boolean, а не " + condType);
             }
             analyze(whileNode.getBody());
-        }
-        else if (node instanceof ForNode forNode) {
-            // Для цикла for (i in range) создаем новую область видимости
-            currentScope = new SymbolTable(currentScope);
+        } else if (node instanceof ForNode forNode) {
 
-            // В Kotlin итератор в for Int
-            // Для упрощения считаем, что итератор всегда Int и неизменяемый
-            currentScope.add(forNode.getIteratorName(), TypeDesc.INT, false);
-
-            analyze(forNode.getRange());
+            TypeDesc intType = TypeDesc.INT;
+            currentScope.add(forNode.getIteratorName(), intType, false);
+            inferType(forNode.getRange());
             analyze(forNode.getBody());
-
-            currentScope = currentScope.getParent();
         }
+
+        currentScope = oldScope;
     }
 
     private void checkIf(IfNode node) {
         TypeDesc condType = inferType(node.getCondition());
+
         if (!condType.equals(TypeDesc.BOOL)) {
             throw new SemanticException("Условие в 'if' должно быть Boolean, а не " + condType);
         }
+
+        // Для блока then создаем свой scope
+        SymbolTable oldScope = currentScope;
+
+        currentScope = new SymbolTable(oldScope);
         analyze(node.getThenBlock());
+        currentScope = oldScope;
+
+        // Для блока else создаем свой scope
         if (node.getElseBlock() != null) {
+            currentScope = new SymbolTable(oldScope);
             analyze(node.getElseBlock());
+            currentScope = oldScope;
         }
     }
 
@@ -78,6 +90,9 @@ public class SemanticAnalyzer {
         if (info == null) throw new SemanticException("Функция " + node.getName() + " не определена.");
 
         TypeDesc funcType = info.type();
+        if (funcType.getBaseType() != TypeDesc.BaseType.FUNCTION) {
+            throw new SemanticException("Идентификатор " + node.getName() + " не является функцией.");
+        }
         List<ExprNode> args = node.getArgs();
         List<TypeDesc> expectedParams = funcType.getParams();
 
@@ -100,10 +115,11 @@ public class SemanticAnalyzer {
             return true;
         }
 
-        if (target.equals(TypeDesc.STRING)) {
+        if (target.equals(TypeDesc.OBJECT)) {
             if (source.equals(TypeDesc.INT) ||
                     source.equals(TypeDesc.FLOAT) ||
-                    source.equals(TypeDesc.BOOL)) {
+                    source.equals(TypeDesc.BOOL) ||
+                    source.equals(TypeDesc.STRING)) {
                 return true;
             }
         }
@@ -131,7 +147,9 @@ public class SemanticAnalyzer {
             throw new SemanticException("Тип значения не совпадает с типом переменной " + node.getName());
         }
 
-        currentScope.add(node.getName(), declaredType, node.isMutable());
+        SymbolInfo info = currentScope.add(node.getName(), declaredType, node.isMutable());
+
+        node.setNodeInfo(info.toString());
     }
 
     private void checkFunc(FuncNode node) {
@@ -152,7 +170,12 @@ public class SemanticAnalyzer {
 
         // Добавляем параметры в область видимости функции
         for (int i = 0; i < node.getParams().size(); i++) {
-            funcScope.add(node.getParams().get(i).getName(), paramTypes.get(i), false);
+            ParameterNode paramNode = node.getParams().get(i);
+            TypeDesc pType = paramTypes.get(i);
+
+            SymbolInfo paramInfo = funcScope.addParameter(paramNode.getName(), pType);
+
+            paramNode.setNodeInfo(paramInfo.toString());
         }
 
         // Запоминаем, что мы должны вернуть из этой функции
@@ -205,7 +228,7 @@ public class SemanticAnalyzer {
 
             case "-":
             case "+":
-                if (!targetType.isNumber()) { // Вспомогательный метод: targetType == INT || targetType == FLOAT
+                if (!targetType.isNumber()) {
                     throw new SemanticException("Оператор '" + op + "' нельзя применить к типу " + targetType);
                 }
                 return targetType; // Тип результата такой же, как у операнда
@@ -245,11 +268,17 @@ public class SemanticAnalyzer {
         }
         if (node instanceof StringNode) return TypeDesc.STRING;
         if (node instanceof BoolNode) return TypeDesc.BOOL;
-        if (node instanceof IdentNode) {
-            SymbolInfo info = currentScope.resolve(((IdentNode) node).getName());
-            if (info == null) throw new SemanticException("Неизвестный идентификатор: " + ((IdentNode) node).getName());
+
+        if (node instanceof IdentNode identNode) {
+            SymbolInfo info = currentScope.resolve(identNode.getName());
+            if (info == null) {
+                throw new SemanticException("Неизвестный идентификатор: " + identNode.getName());
+            }
+
+            identNode.setNodeInfo(info.toString());
             return info.type();
         }
+
         if (node instanceof BinOpNode) {
             BinOpNode binOp = (BinOpNode) node;
             TypeDesc left = inferType(binOp.getLeft());
@@ -274,9 +303,14 @@ public class SemanticAnalyzer {
             }
         }
         if (node instanceof CallNode) {
+            checkCall((CallNode) node);
+
+
             SymbolInfo info = currentScope.resolve(((CallNode) node).getName());
-            if (info == null) throw new SemanticException("Функция " + ((CallNode) node).getName() + " не определена.");
-            return info.type().getReturnType();
+            if (info != null && info.type().getBaseType() == TypeDesc.BaseType.FUNCTION) {
+                return info.type().getReturnType();
+            }
+            return TypeDesc.VOID;
         }
         if (node instanceof UnaryOpNode unaryOpNode) {
             return checkUnaryOp(unaryOpNode);
@@ -305,6 +339,7 @@ public class SemanticAnalyzer {
             case "String" -> TypeDesc.STRING;
             case "Float" -> TypeDesc.FLOAT;
             case "Boolean" -> TypeDesc.BOOL;
+            case "Unit" -> TypeDesc.UNIT;
             default -> throw new SemanticException("Неизвестный тип: " + typeName);
         };
     }
@@ -312,10 +347,10 @@ public class SemanticAnalyzer {
     // Метод для регистрации стандартных функций
     public void registerBuiltIn() {
         currentScope.add("print",
-                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.VOID, List.of(TypeDesc.STRING)),
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.VOID, List.of(TypeDesc.OBJECT)),
                 false);
         currentScope.add("sum",
-                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.INT, List.of(TypeDesc.INT)),
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.INT, List.of(TypeDesc.INT, TypeDesc.INT)),
                 false);
     }
 }

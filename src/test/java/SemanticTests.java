@@ -52,7 +52,7 @@ public class SemanticTests {
         fun doNothing() {
             return 10
         }
-    """, "Неизвестный тип: Unit");
+    """, "Функция должна возвращать unit, но возвращает int");
     }
 
     @Test
@@ -66,5 +66,19 @@ public class SemanticTests {
     @Test
     void testUndefinedVariable() {
         assertSemanticError("y = 10;", "Переменная y не найдена.");
+    }
+
+    @Test
+    void testRandomCode() {
+        assertSemanticError("""
+        val x: Boolean = false;
+        var y = 20;
+        
+        fun sum(a: Int, b: Int): Int {
+            return a + b
+        }
+        
+        sum(x, y);
+    """, "Аргумент 1 функции sum должен иметь тип int, а не bool");
     }
 }

@@ -54,9 +54,13 @@ class NumNode implements ExprNode {
 @Data
 class IdentNode implements ExprNode {
     private final String name;
+    private String nodeInfo = null;
+
     public IdentNode(String name) { this.name = name; }
     @Override
-    public String toString() { return "id: " + name; }
+    public String toString() {
+        return name + (nodeInfo != null ? ": " + nodeInfo : "");
+    }
 }
 
 class StringNode implements ExprNode {
@@ -160,6 +164,7 @@ class PropertyNode implements StmtNode {
     private final String name;
     private final String type;
     private final ExprNode value;
+    private String nodeInfo = null;
 
     public PropertyNode(boolean isMutable, String name, String type, ExprNode value) {
         this.isMutable = isMutable;
@@ -173,7 +178,8 @@ class PropertyNode implements StmtNode {
     }
 
     @Override public String toString() {
-        return (isMutable ? "var " : "val ") + name + (type != null ? ": " + type : "");
+        String base = (isMutable ? "var " : "val ") + name;
+        return base + (nodeInfo != null ? ": " + nodeInfo : "");
     }
 }
 
@@ -181,6 +187,7 @@ class PropertyNode implements StmtNode {
 class ParameterNode implements StmtNode {
     private final String name;
     private final String type;
+    private String nodeInfo = null;
 
     public ParameterNode(String name, String type) {
         this.name = name;
@@ -188,13 +195,16 @@ class ParameterNode implements StmtNode {
     }
 
     @Override
-    public String toString() { return name + ": " + type; }
+    public String toString() {
+        return name + (nodeInfo != null ? ": " + nodeInfo : "");
+    }
 }
 
 @Data
 class AssignmentNode implements StmtNode {
     private final String name;
     private final ExprNode value;
+    private String nodeInfo = null;
 
     public AssignmentNode(String name, ExprNode value) {
         this.name = name;
@@ -203,13 +213,13 @@ class AssignmentNode implements StmtNode {
 
     @Override
     public List<AstNode> getChilds() {
-        // У присваивания один ребенок — это то, что мы присваиваем
+        // у присваивания один ребенок это то, что мы присваиваем
         return Collections.singletonList(value);
     }
 
     @Override
     public String toString() {
-        return "assign: " + name;
+        return "assign: " + name + (nodeInfo != null ? ": " + nodeInfo : "");
     }
 }
 
