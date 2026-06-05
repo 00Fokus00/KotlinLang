@@ -12,7 +12,7 @@ public class SemanticAnalyzer {
             for (AstNode child : node.getChilds()) {
                 analyze(child);
             }
-            currentScope = currentScope.getParent();
+//            currentScope = currentScope.getParent();
         }
         else if (node instanceof PropertyNode) {
             checkProperty((PropertyNode) node);
@@ -165,15 +165,16 @@ public class SemanticAnalyzer {
         // Регистрируем функцию в текущем scope
         currentScope.add(node.getName(), funcType, false);
 
-        // Входим в тело функции
-        SymbolTable funcScope = new SymbolTable(currentScope);
+        // Создаём scope для тела функции
+        SymbolTable oldScope = currentScope;
+        currentScope = new SymbolTable(oldScope);
 
         // Добавляем параметры в область видимости функции
         for (int i = 0; i < node.getParams().size(); i++) {
             ParameterNode paramNode = node.getParams().get(i);
             TypeDesc pType = paramTypes.get(i);
 
-            SymbolInfo paramInfo = funcScope.addParameter(paramNode.getName(), pType);
+            SymbolInfo paramInfo = currentScope.addParameter(paramNode.getName(), pType);
 
             paramNode.setNodeInfo(paramInfo.toString());
         }
@@ -182,12 +183,9 @@ public class SemanticAnalyzer {
         TypeDesc oldReturnType = currentExpectedReturnType;
         currentExpectedReturnType = returnType;
 
-        SymbolTable previousScope = currentScope;
-        currentScope = funcScope;
-
         analyze(node.getBody());
 
-        currentScope = previousScope;
+        currentScope = oldScope;
         currentExpectedReturnType = oldReturnType;
     }
 

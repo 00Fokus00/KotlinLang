@@ -61,11 +61,11 @@ public class AstBuilder extends KotlinLangBaseVisitor<AstNode> {
     @Override
     public AstNode visitBlock(KotlinLangParser.BlockContext ctx) {
         List<StmtNode> stmts = new ArrayList<>();
-        for (var stmtCtx : ctx.stmt()) {
-            stmts.add((StmtNode) visit(stmtCtx));
-        }
-        for (var declCtx : ctx.declaration()) {
-            stmts.add((StmtNode) visit(declCtx));
+        for (var child : ctx.children) {
+            AstNode node = visit(child);
+            if (node instanceof StmtNode stmt) {
+                stmts.add(stmt);
+            }
         }
         return new StmtListNode(stmts);
     }
