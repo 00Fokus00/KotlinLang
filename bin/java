@@ -1,0 +1,13 @@
+#!/bin/bash
+
+CD=$(dirname "$(readlink -f "$0")")  # "
+
+[[ -e "$CD/_props.sh" ]] && . "$CD/_props.sh"
+
+
+JAVA=java
+
+[[ -e "$CD/_props.sh" ]] && . "$CD/_props.sh"
+
+
+"$JAVA" "$@"

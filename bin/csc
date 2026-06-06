@@ -1,0 +1,67 @@
+#!/bin/bash
+
+CD=$(dirname "$(readlink -f "$0")")  # "
+
+DOTNET_SDKS_DIR=/usr/lib/dotnet/sdk
+DOTNET_VERSION=10.0
+NUGET_PACKAGES=~/.nuget/packages
+
+[[ -e "$CD/_props.sh" ]] && . "$CD/_props.sh"
+
+
+DOTNET_SDK_DIR=$(echo $DOTNET_SDKS_DIR/$DOTNET_VERSION.*)
+CSC=$(find "$DOTNET_SDK_DIR" -name csc)
+
+
+REFERENCES='
+  mscorlib.dll
+  netstandard.dll
+'
+
+RR=
+for R in $REFERENCES; do
+  R=$(find "$DOTNET_SDK_DIR/ref" -name $R)
+  if [[ -n $RR ]]; then
+    RR=$RR,$R
+  else
+    RR=$R
+  fi
+done
+CSC=($CSC -reference:"$RR")
+
+[[ -e "$CD/_props.sh" ]] && . "$CD/_props.sh"
+
+
+CS_FILE=
+OUT_FILE=
+for ARG in "$@"; do   
+  if [[ -z "$CS_FILE" && "$ARG" =~ \.cs$ ]]; then
+    CS_FILE="$ARG"
+  fi
+  if [[ "$ARG" =~ ^[-/](out|output)[:=](.+)$ ]]; then
+    OUT_FILE="${BASH_REMATCH[2]}"
+  fi
+done
+if [[ -n "$CS_FILE" && -z "$OUT_FILE" ]]; then
+  OUT_FILE="${CS_FILE%.*}.exe"
+fi
+
+#if [[ -f "$CS_FILE" && -f "$OUT_FILE" ]]; then
+#  rm -f "$OUT_FILE"
+#fi
+
+
+"${CSC[@]}" "$@"
+
+
+if [[ -f "$CS_FILE" && -f "$OUT_FILE" ]]; then
+  CONFIG='{
+  "runtimeOptions": {
+    "framework": {
+      "name": "Microsoft.NETCore.App",
+      "version": "'$DOTNET_VERSION'.0"
+    }
+  }
+}'
+  echo "$CONFIG" >"${OUT_FILE%.*}.runtimeconfig.json"
+fi

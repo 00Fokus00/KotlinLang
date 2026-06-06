@@ -1,4 +1,4 @@
-// Generated from C:/Users/iafil/OneDrive/Документы/course3/TK/DemoLang.java.antlr(ast)/src/main/java/ru/vsu/cs/demolang/antlr/KotlinLang.g4 by ANTLR 4.13.2
+// Generated from ru/vsu/cs/demolang/antlr/KotlinLang.g4 by ANTLR 4.13.2
 package ru.vsu.cs.demolang.antlr;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+CD=$(dirname "$(readlink -f "$0")")  # "
+
+JAVA="$CD/java"
+
+[[ -e "$CD/_props.sh" ]] && . "$CD/_props.sh"
+
+
+#PROGUARD_ASSEMBLER=("$CD/.java/proguard-assembler/bin/assembler.sh")
+PROGUARD_ASSEMBLER=("$JAVA" -jar "$CD/.java/proguard-assembler/lib/assembler.jar")
+
+[[ -e "$CD/_props.sh" ]] && . "$CD/_props.sh"
+
+
+"${PROGUARD_ASSEMBLER[@]}" "$@"

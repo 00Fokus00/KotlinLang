@@ -47,6 +47,7 @@ interface StmtNode extends AstNode {}
 class NumNode implements ExprNode {
     private final String value;
     public NumNode(String value) { this.value = value; }
+    public String getValue() { return value; }
     @Override
     public String toString() { return "num: " + value; }
 }
@@ -55,6 +56,7 @@ class NumNode implements ExprNode {
 class IdentNode implements ExprNode {
     private final String name;
     private String nodeInfo = null;
+    private SymbolInfo symbolInfo = null;
 
     public IdentNode(String name) { this.name = name; }
     @Override
@@ -66,6 +68,7 @@ class IdentNode implements ExprNode {
 class StringNode implements ExprNode {
     private final String value;
     public StringNode(String value) { this.value = value; }
+    public String getValue() { return value; }
     @Override
     public String toString() { return "str: " + value; }
 }
@@ -107,6 +110,7 @@ class BinOpNode implements ExprNode {
 class CallNode implements ExprNode {
     private final String name;
     private final List<ExprNode> args;
+    private SymbolInfo symbolInfo = null;
 
     public CallNode(String name, List<ExprNode> args) {
         this.name = name;
@@ -165,6 +169,7 @@ class PropertyNode implements StmtNode {
     private final String type;
     private final ExprNode value;
     private String nodeInfo = null;
+    private SymbolInfo symbolInfo = null;
 
     public PropertyNode(boolean isMutable, String name, String type, ExprNode value) {
         this.isMutable = isMutable;
@@ -188,6 +193,7 @@ class ParameterNode implements StmtNode {
     private final String name;
     private final String type;
     private String nodeInfo = null;
+    private SymbolInfo symbolInfo = null;
 
     public ParameterNode(String name, String type) {
         this.name = name;
@@ -205,6 +211,7 @@ class AssignmentNode implements StmtNode {
     private final String name;
     private final ExprNode value;
     private String nodeInfo = null;
+    private SymbolInfo symbolInfo = null;
 
     public AssignmentNode(String name, ExprNode value) {
         this.name = name;
@@ -289,6 +296,7 @@ class ForNode implements StmtNode {
     private final String iteratorName;
     private final ExprNode range;
     private final StmtNode body;
+    private SymbolInfo iteratorInfo = null;
 
     public ForNode(String iteratorName, ExprNode range, StmtNode body) {
         this.iteratorName = iteratorName;

@@ -1,0 +1,27 @@
+#!/bin/bash
+
+CD=$(dirname "$(readlink -f "$0")")  # "
+
+DOTNET_SDKS_DIR=/usr/lib/dotnet/sdk
+DOTNET_VERSION=10.0
+NUGET_PACKAGES=~/.nuget/packages
+
+[[ -e "$CD/_props.sh" ]] && . "$CD/_props.sh"
+
+
+ILDASM=$(find "$NUGET_PACKAGES/runtime.linux-x64.microsoft.netcore.ildasm/" -name ildasm)
+
+[[ -e "$CD/_props.sh" ]] && . "$CD/_props.sh"
+
+
+OUT_FILE=
+for ARG in "$@"; do   
+  if [[ "$ARG" =~ ^[-/](out|output)[:=](.+)$ ]]; then
+    OUT_FILE="${BASH_REMATCH[2]}"
+  fi
+done
+
+
+"$ILDASM" "$@"
+
+rm -f "$OUT_FILE.res"

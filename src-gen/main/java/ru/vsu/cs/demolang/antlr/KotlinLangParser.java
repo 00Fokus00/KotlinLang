@@ -1,4 +1,4 @@
-// Generated from C:/Users/iafil/OneDrive/Документы/course3/TK/DemoLang.java.antlr(ast)/src/main/java/ru/vsu/cs/demolang/antlr/KotlinLang.g4 by ANTLR 4.13.2
+// Generated from ru/vsu/cs/demolang/antlr/KotlinLang.g4 by ANTLR 4.13.2
 package ru.vsu.cs.demolang.antlr;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -129,14 +129,6 @@ public class KotlinLangParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_prog; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterProg(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitProg(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitProg(this);
 			else return visitor.visitChildren(this);
@@ -223,14 +215,6 @@ public class KotlinLangParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_declaration; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterDeclaration(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitDeclaration(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitDeclaration(this);
 			else return visitor.visitChildren(this);
@@ -289,14 +273,6 @@ public class KotlinLangParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_propertyDecl; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterPropertyDecl(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitPropertyDecl(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitPropertyDecl(this);
@@ -391,14 +367,6 @@ public class KotlinLangParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_functionDecl; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterFunctionDecl(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitFunctionDecl(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitFunctionDecl(this);
 			else return visitor.visitChildren(this);
@@ -484,14 +452,6 @@ public class KotlinLangParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_funcParam; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterFuncParam(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitFuncParam(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitFuncParam(this);
 			else return visitor.visitChildren(this);
@@ -541,14 +501,6 @@ public class KotlinLangParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_block; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterBlock(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitBlock(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitBlock(this);
@@ -633,14 +585,6 @@ public class KotlinLangParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_type; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterType(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitType(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitType(this);
 			else return visitor.visitChildren(this);
@@ -692,14 +636,6 @@ public class KotlinLangParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_stmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterStmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitStmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitStmt(this);
@@ -835,14 +771,6 @@ public class KotlinLangParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_assignment; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterAssignment(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitAssignment(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitAssignment(this);
 			else return visitor.visitChildren(this);
@@ -884,14 +812,6 @@ public class KotlinLangParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_returnStmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterReturnStmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitReturnStmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitReturnStmt(this);
@@ -964,14 +884,6 @@ public class KotlinLangParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_ifStmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterIfStmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitIfStmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitIfStmt(this);
@@ -1099,14 +1011,6 @@ public class KotlinLangParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_whileStmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterWhileStmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitWhileStmt(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitWhileStmt(this);
 			else return visitor.visitChildren(this);
@@ -1190,14 +1094,6 @@ public class KotlinLangParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_forStmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterForStmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitForStmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitForStmt(this);
@@ -1297,14 +1193,6 @@ public class KotlinLangParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_expr; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitExpr(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitExpr(this);
@@ -1510,14 +1398,6 @@ public class KotlinLangParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_primary; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterPrimary(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitPrimary(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitPrimary(this);
 			else return visitor.visitChildren(this);
@@ -1650,14 +1530,6 @@ public class KotlinLangParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_unaryExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterUnaryExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitUnaryExpr(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitUnaryExpr(this);
 			else return visitor.visitChildren(this);
@@ -1737,14 +1609,6 @@ public class KotlinLangParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_prefixOp; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterPrefixOp(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitPrefixOp(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitPrefixOp(this);
 			else return visitor.visitChildren(this);
@@ -1787,14 +1651,6 @@ public class KotlinLangParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_postfixOp; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).enterPostfixOp(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof KotlinLangListener ) ((KotlinLangListener)listener).exitPostfixOp(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof KotlinLangVisitor ) return ((KotlinLangVisitor<? extends T>)visitor).visitPostfixOp(this);

@@ -1,0 +1,50 @@
+#!/bin/bash
+
+CD=$(dirname "$(readlink -f "$0")")  # "
+
+DOTNET_SDKS_DIR=/usr/lib/dotnet/sdk
+DOTNET_VERSION=10.0
+NUGET_PACKAGES=~/.nuget/packages
+
+[[ -e "$CD/_props.sh" ]] && . "$CD/_props.sh"
+
+
+ILASM=$(find "$NUGET_PACKAGES/runtime.linux-x64.microsoft.netcore.ilasm/" -name ilasm)
+
+[[ -e "$CD/_props.sh" ]] && . "$CD/_props.sh"
+
+
+IL_FILE=
+OUT_FILE=
+for ARG in "$@"; do   
+  if [[ -z "$IL_FILE" && "$ARG" =~ \.il$ ]]; then
+    IL_FILE="$ARG"
+  fi
+  if [[ "$ARG" =~ ^[-/](out|output)[:=](.+)$ ]]; then
+    OUT_FILE="${BASH_REMATCH[2]}"
+  fi
+done
+if [[ -n "$IL_FILE" && -z "$OUT_FILE" ]]; then
+  OUT_FILE="${IL_FILE%.*}.exe"
+  OUT_FILE="./${OUT_FILE##*/}"
+fi
+
+#if [[ -f "$CS_FILE" && -f "$OUT_FILE" ]]; then
+#  rm -f "$OUT_FILE"
+#fi
+
+
+"$ILASM" "$@"
+
+
+if [[ -f "$IL_FILE" && -f "$OUT_FILE" ]]; then
+  CONFIG='{
+  "runtimeOptions": {
+    "framework": {
+      "name": "Microsoft.NETCore.App",
+      "version": "'$DOTNET_VERSION'.0"
+    }
+  }
+}'
+  echo "$CONFIG" >"${OUT_FILE%.*}.runtimeconfig.json"
+fi

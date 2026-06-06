@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Предварительно установить .NET 10 SDK командой (в Ubuntu 24):
+#   sudo apt-get install dotnet-sdk-10.0
+# Установка на другие дистрибутивы - см. страницу
+#   https://learn.microsoft.com/ru-ru/dotnet/core/install/linux
+
+#exit
+
+TEMP_PACKAGE_NAME=__temp_project__
+
+# Создать временный проект
+dotnet new console -n $TEMP_PACKAGE_NAME
+cd ./$TEMP_PACKAGE_NAME
+
+# Добавить пакет
+dotnet add package runtime.linux-x64.microsoft.netcore.ildasm
+dotnet add package runtime.linux-x64.microsoft.netcore.ilasm
+
+# Восстановить пакеты
+dotnet restore
+
+# Пакет теперь в ~/.nuget/packages/
+cd ..
+rm -rf ./$TEMP_PACKAGE_NAME

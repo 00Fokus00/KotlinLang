@@ -53,7 +53,8 @@ public class SemanticAnalyzer {
             }
             analyze(whileNode.getBody());
         } else if (node instanceof ForNode forNode) {
-
+            SymbolInfo iterInfo = currentScope.add(forNode.getIteratorName(), TypeDesc.INT, false);
+            forNode.setIteratorInfo(iterInfo);
             TypeDesc intType = TypeDesc.INT;
             currentScope.add(forNode.getIteratorName(), intType, false);
             inferType(forNode.getRange());
@@ -93,6 +94,9 @@ public class SemanticAnalyzer {
         if (funcType.getBaseType() != TypeDesc.BaseType.FUNCTION) {
             throw new SemanticException("Идентификатор " + node.getName() + " не является функцией.");
         }
+
+        node.setSymbolInfo(info);
+
         List<ExprNode> args = node.getArgs();
         List<TypeDesc> expectedParams = funcType.getParams();
 
@@ -150,6 +154,7 @@ public class SemanticAnalyzer {
         SymbolInfo info = currentScope.add(node.getName(), declaredType, node.isMutable());
 
         node.setNodeInfo(info.toString());
+        node.setSymbolInfo(info);
     }
 
     private void checkFunc(FuncNode node) {
@@ -177,6 +182,7 @@ public class SemanticAnalyzer {
             SymbolInfo paramInfo = currentScope.addParameter(paramNode.getName(), pType);
 
             paramNode.setNodeInfo(paramInfo.toString());
+            paramNode.setSymbolInfo(paramInfo);
         }
 
         // Запоминаем, что мы должны вернуть из этой функции
@@ -211,6 +217,8 @@ public class SemanticAnalyzer {
         if (!info.type().equals(valueType)) {
             throw new SemanticException("Несовместимые типы при присваивании в " + node.getName());
         }
+        node.setNodeInfo(info.toString());
+        node.setSymbolInfo(info);
     }
 
     private TypeDesc checkUnaryOp(UnaryOpNode node) {
@@ -274,6 +282,7 @@ public class SemanticAnalyzer {
             }
 
             identNode.setNodeInfo(info.toString());
+            identNode.setSymbolInfo(info);
             return info.type();
         }
 
@@ -344,11 +353,53 @@ public class SemanticAnalyzer {
 
     // Метод для регистрации стандартных функций
     public void registerBuiltIn() {
+
         currentScope.add("print",
-                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.VOID, List.of(TypeDesc.OBJECT)),
-                false);
-        currentScope.add("sum",
-                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.INT, List.of(TypeDesc.INT, TypeDesc.INT)),
-                false);
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.VOID, List.of(TypeDesc.OBJECT)), false);
+
+        currentScope.add("println",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.VOID, List.of(TypeDesc.OBJECT)), false);
+
+        currentScope.add("println_empty",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.VOID, List.of()), false);
+
+        currentScope.add("readLine",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.STRING, List.of()), false);
+
+        currentScope.add("convert_int",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.STRING, List.of(TypeDesc.INT)), false);
+
+        currentScope.add("convert_float",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.STRING, List.of(TypeDesc.FLOAT)), false);
+
+        currentScope.add("convert_bool",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.STRING, List.of(TypeDesc.BOOL)), false);
+
+        currentScope.add("to_int",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.INT, List.of(TypeDesc.STRING)), false);
+
+        currentScope.add("to_float",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.FLOAT, List.of(TypeDesc.STRING)), false);
+
+        currentScope.add("concat",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.STRING, List.of(TypeDesc.STRING, TypeDesc.STRING)), false);
+
+        currentScope.add("compare",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.INT, List.of(TypeDesc.STRING, TypeDesc.STRING)), false);
+
+        currentScope.add("length",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.INT, List.of(TypeDesc.STRING)), false);
+
+        currentScope.add("rnd",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.INT, List.of(TypeDesc.INT)), false);
+
+        currentScope.add("sqrt",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.FLOAT, List.of(TypeDesc.FLOAT)), false);
+
+        currentScope.add("abs_int",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.INT, List.of(TypeDesc.INT)), false);
+
+        currentScope.add("abs_float",
+                new TypeDesc(TypeDesc.BaseType.FUNCTION, TypeDesc.FLOAT, List.of(TypeDesc.FLOAT)), false);
     }
 }

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+CD=$(dirname "$(readlink -f "$0")")  # "
+
+export PATH=$CD/bin:$PATH
+
+if [[ ! "$1" =~ \.java$ ]]; then
+  echo Usage:
+  echo "  $0 <filename>.java"
+  exit
+fi
+
+
+
+FILENAME="${1%.*}"
+CLASSNAME="${FILENAME##*/}"
+
+rm -rf "$FILENAME.class" "$FILENAME_jbc.class" "$FILENAME.jbc" "${FILENAME}_jbc.jbc" "${FILENAME}_tmp" >/dev/null 2>&1
+
+"$CD/javac" --release 17 "$FILENAME.java"
+"$CD/proguard-assembler" "$FILENAME.class" "$FILENAME.jbc"
+cat "$FILENAME.jbc" | sed -e "s/class $CLASSNAME/class ${CLASSNAME}_jbc/" -e "s/new $CLASSNAME$/new ${CLASSNAME}_jbc/" >"${FILENAME}_jbc.jbc"
+"$CD/proguard-assembler" "${FILENAME}_jbc.jbc" "${FILENAME}_jbc.class"
+"$CD/proguard" -dontwarn -dontoptimize -dontobfuscate -dontshrink -injars "${FILENAME}_jbc.class" -outjars "${FILENAME}_tmp"
+cp -f "${FILENAME}_tmp/${CLASSNAME}_jbc.class" "${FILENAME}_jbc.class"
+rm -rf "${FILENAME}_tmp"
+
+rm -f "${FILENAME}_jbc.jbc"

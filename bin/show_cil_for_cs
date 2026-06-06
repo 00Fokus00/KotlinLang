@@ -1,0 +1,27 @@
+#!/bin/bash
+
+CD=$(dirname "$(readlink -f "$0")")  # "
+
+export PATH=$CD/bin:$PATH
+
+if [[ ! "$1" =~ \.cs$ ]]; then
+  echo Usage:
+  echo "  $0 <filename>.cs"
+  exit
+fi
+
+
+
+FILENAME="${1%.*}"
+
+rm -f "$FILENAME.exe" "$FILENAME.il.exe" "$FILENAME.il.res" "$FILENAME.res" "$FILENAME.pdb" "$FILENAME.exe.mdb" "$FILENAME.il" "$FILENAME%.il.html" "$FILENAME%.il.runtimeconfig.json" >/dev/null 2>&1
+
+"$CD/csc" -optimize+ -debug+ -out:"$FILENAME.exe" "$FILENAME.cs"
+"$CD/ildasm" -out="$FILENAME.il" "$FILENAME.exe"
+"$CD/ildasm" -html -source -output="$FILENAME.il.html" "$FILENAME.exe"
+"$CD/ilasm" -output="$FILENAME.il.exe" "$FILENAME.il"
+
+chmod 'u+x,g+x,o+x' "$FILENAME.il.exe"
+fromdos "$FILENAME.il" "$FILENAME.il.html"
+
+rm -f "$FILENAME.il.res" "$FILENAME.res" "$FILENAME.pdb" "$FILENAME.exe.mdb" >/dev/null 2>&1

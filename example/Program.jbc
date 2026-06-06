@@ -1,0 +1,70 @@
+  version 17;
+  public class Program extends java.lang.Object
+  {
+    
+    public static void main(java.lang.String[])
+    {
+      ldc "\"--- Тестирование компилятора DemoLang ---\""
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#void println(java.lang.String)
+      invokestatic Program#void println_empty()
+      ldc 100
+      istore 0
+      iload 0
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#int rnd(int)
+      istore 1
+      ldc "\"Случайное число от 0 до 99: \""
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#void print(java.lang.String)
+      iload 1
+      invokestatic Program#java.lang.String convert_int(int)
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#void println(java.lang.String)
+      ldc2_w 64.0D
+      dneg
+      dstore 2
+      dload 2
+      invokestatic Program#double abs_float(double)
+      dstore 4
+      dload 4
+      invokestatic Program#double sqrt(double)
+      dstore 6
+      ldc "\"Абсолютное значение: \""
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#void print(java.lang.String)
+      dload 4
+      invokestatic Program#java.lang.String convert_float(double)
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#void println(java.lang.String)
+      ldc "\"Квадратный корень: \""
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#void print(java.lang.String)
+      dload 6
+      invokestatic Program#java.lang.String convert_float(double)
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#void println(java.lang.String)
+      iload 1
+      ldc 50
+      if_icmpgt L_0
+      iconst_0
+      goto L_1
+    L_0:
+      iconst_1
+    L_1:
+      ifeq L_IF_ELSE_2
+      ldc "\"Результат: Число больше 50!\""
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#void println(java.lang.String)
+      goto L_IF_END_3
+    L_IF_ELSE_2:
+      ldc "\"Результат: Число меньше или равно 50!\""
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#void println(java.lang.String)
+    L_IF_END_3:
+      ldc "\"----------------------------------------\""
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#void println(java.lang.String)
+      return
+    }
+    
+    public static int compute(int a, int b)
+    {
+      iconst_2
+      istore 2
+      iconst_3
+      istore 2
+      ldc 0
+      ireturn
+    }
+    
+  }
