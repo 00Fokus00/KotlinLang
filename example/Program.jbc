@@ -6,7 +6,7 @@
     {
       ldc "\"--- Тестирование компилятора DemoLang ---\""
       invokestatic ru.vsu.cs.demolang.runtime.Runtime#void println(java.lang.String)
-      invokestatic Program#void println_empty()
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#void println_empty()
       ldc 100
       istore 0
       iload 0
@@ -15,26 +15,26 @@
       ldc "\"Случайное число от 0 до 99: \""
       invokestatic ru.vsu.cs.demolang.runtime.Runtime#void print(java.lang.String)
       iload 1
-      invokestatic Program#java.lang.String convert_int(int)
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#java.lang.String convert_int(int)
       invokestatic ru.vsu.cs.demolang.runtime.Runtime#void println(java.lang.String)
       ldc2_w 64.0D
       dneg
       dstore 2
       dload 2
-      invokestatic Program#double abs_float(double)
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#double abs_float(double)
       dstore 4
       dload 4
-      invokestatic Program#double sqrt(double)
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#double sqrt(double)
       dstore 6
       ldc "\"Абсолютное значение: \""
       invokestatic ru.vsu.cs.demolang.runtime.Runtime#void print(java.lang.String)
       dload 4
-      invokestatic Program#java.lang.String convert_float(double)
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#java.lang.String convert_float(double)
       invokestatic ru.vsu.cs.demolang.runtime.Runtime#void println(java.lang.String)
       ldc "\"Квадратный корень: \""
       invokestatic ru.vsu.cs.demolang.runtime.Runtime#void print(java.lang.String)
       dload 6
-      invokestatic Program#java.lang.String convert_float(double)
+      invokestatic ru.vsu.cs.demolang.runtime.Runtime#java.lang.String convert_float(double)
       invokestatic ru.vsu.cs.demolang.runtime.Runtime#void println(java.lang.String)
       iload 1
       ldc 50

@@ -21,7 +21,7 @@ public class Runtime {
         System.out.println(p0);
     }
 
-    public static void println_empty() {
+    public static void println_empty(){
         System.out.println();
     }
 

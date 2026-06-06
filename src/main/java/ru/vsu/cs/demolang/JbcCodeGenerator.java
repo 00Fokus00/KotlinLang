@@ -2,10 +2,14 @@ package ru.vsu.cs.demolang;
 
 import ru.vsu.cs.demolang.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringJoiner;
 
 public class JbcCodeGenerator extends CodeGenerator {
+
+    private static final Set<String> BUILT_IN_NAMES = loadRuntimeMethods();
 
     private static final String RUNTIME = "ru.vsu.cs.demolang.runtime.Runtime";
     private static final int JBC_VERSION = 17;
@@ -46,8 +50,7 @@ public class JbcCodeGenerator extends CodeGenerator {
         emitHeader();
         emitGlobalFields(program);
         emitFunctions(program);
-        // Если в программе есть fun main() — она уже сгенерирована как
-        // main(java.lang.String[]), второй main не нужен.
+
         if (!hasFunMain(program)) {
             emitMain(program);
         }
@@ -196,7 +199,6 @@ public class JbcCodeGenerator extends CodeGenerator {
                 && (u.getOp().equals("++") || u.getOp().equals("--"))) {
             emitIncDecStmt(u);
         }
-        // FuncNode внутри тела не поддерживаем
     }
 
 
@@ -271,9 +273,7 @@ public class JbcCodeGenerator extends CodeGenerator {
         loopEndLabel = prevEnd;
     }
 
-    // ── for (i in expr)
-    //
-    // Kotlin: for (i in a..b) { body }
+    // for (i in a..b) { body }
     //
     // Генерируем
     //   i = a
@@ -504,13 +504,11 @@ public class JbcCodeGenerator extends CodeGenerator {
             emitExpr(arg);
 
             if (argType == null || argType.getBaseType() != TypeDesc.BaseType.STRING) {
-                // конвертируем в String через Runtime.convert
                 String convertSig = argType != null && argType.getBaseType() == TypeDesc.BaseType.FLOAT
                         ? "double" : "int";
                 add("invokestatic " + RUNTIME + "#java.lang.String convert(" + convertSig + ")");
             }
 
-            SymbolInfo funcInfo = node.getSymbolInfo();
             add("invokestatic " + RUNTIME + "#void " + name + "(java.lang.String)");
             return;
         }
@@ -537,15 +535,21 @@ public class JbcCodeGenerator extends CodeGenerator {
                 + " " + name + "(" + paramSig + ")");
     }
 
-    /**
-     * Встроенные функции, делегируемые в Runtime класс.
-     */
+    private static Set<String> loadRuntimeMethods() {
+        try {
+            Set<String> names = new HashSet<>();
+            for (var method : Class.forName("ru.vsu.cs.demolang.runtime.Runtime").getMethods()) {
+                names.add(method.getName());
+            }
+            return names;
+        } catch (ClassNotFoundException e) {
+            return Set.of("print", "println", "readLine",
+                    "to_int", "to_float", "convert", "concat", "rnd");
+        }
+    }
+
     private boolean isBuiltIn(String name) {
-        return switch (name) {
-            case "print", "println", "readLine",
-                 "to_int", "to_float", "convert", "concat", "rnd" -> true;
-            default -> false;
-        };
+        return BUILT_IN_NAMES.contains(name);
     }
 
     private void emitLoad(SymbolInfo info) {
