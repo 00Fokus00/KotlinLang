@@ -236,6 +236,7 @@ class FuncNode implements StmtNode {
     private final List<ParameterNode> params;
     private final String returnType;
     private final StmtNode body;
+    private SymbolTable funcScope = null;
 
     public FuncNode(String name, List<ParameterNode> params, String returnType, StmtNode body) {
         this.name = name; this.params = params; this.returnType = returnType; this.body = body;
@@ -326,3 +327,12 @@ class ReturnNode implements StmtNode {
     @Override
     public String toString() { return "return"; }
 }
+
+class ContinueNode implements StmtNode {
+    @Override public String toString() { return "continue"; }
+}
+
+class BreakNode implements StmtNode {
+    @Override public String toString() { return "break"; }
+}
+

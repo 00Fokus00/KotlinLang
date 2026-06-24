@@ -195,6 +195,8 @@ public class JbcCodeGenerator extends CodeGenerator {
         else if (node instanceof ForNode f) emitFor(f);
         else if (node instanceof ReturnNode r) emitReturn(r);
         else if (node instanceof StmtListNode l) emitStmtNode(l);
+        else if (node instanceof ContinueNode) emitContinue();
+        else if (node instanceof BreakNode) emitBreak();
         else if (node instanceof UnaryOpNode u
                 && (u.getOp().equals("++") || u.getOp().equals("--"))) {
             emitIncDecStmt(u);
@@ -212,7 +214,6 @@ public class JbcCodeGenerator extends CodeGenerator {
         }
 
     }
-
 
     private void emitAssignment(AssignmentNode node) {
         SymbolInfo info = node.getSymbolInfo();
@@ -237,10 +238,12 @@ public class JbcCodeGenerator extends CodeGenerator {
     }
 
     private void emitIf(IfNode node) {
-        CodeLabel elseLabel = new CodeLabel("L_IF_ELSE");
-        CodeLabel endLabel = new CodeLabel("L_IF_END");
+        String suffix = "_" + node.hashCode();
+        CodeLabel elseLabel = new CodeLabel("L_IF_ELSE" + suffix);
+        CodeLabel endLabel = new CodeLabel("L_IF_END" + suffix);
 
         emitExpr(node.getCondition());
+
         add("ifeq", elseLabel);
 
         emitStmtNode(node.getThenBlock());
@@ -257,15 +260,20 @@ public class JbcCodeGenerator extends CodeGenerator {
         CodeLabel prevNext = loopNextLabel;
         CodeLabel prevEnd = loopEndLabel;
 
-        CodeLabel startLabel = new CodeLabel("L_WHILE_START");
-        CodeLabel endLabel = new CodeLabel("L_WHILE_END");
+        String suffix = "_" + node.hashCode();
+        CodeLabel startLabel = new CodeLabel("L_WHILE_START" + suffix);
+        CodeLabel endLabel = new CodeLabel("L_WHILE_END" + suffix);
+
         loopNextLabel = startLabel;
         loopEndLabel = endLabel;
 
         add(startLabel);
+
         emitExpr(node.getCondition());
         add("ifeq", endLabel);
+
         emitStmtNode(node.getBody());
+
         add("goto", startLabel);
         add(endLabel);
 
@@ -289,32 +297,39 @@ public class JbcCodeGenerator extends CodeGenerator {
         CodeLabel prevNext = loopNextLabel;
         CodeLabel prevEnd = loopEndLabel;
 
-        CodeLabel startLabel = new CodeLabel("L_FOR_START");
-        CodeLabel endLabel = new CodeLabel("L_FOR_END");
-        CodeLabel nextLabel = new CodeLabel("L_FOR_NEXT");
+        // Уникальный id для меток этого цикла
+        int id = labelCounter++;
+        CodeLabel startLabel = new CodeLabel("L_FOR_START_" + id);
+        CodeLabel endLabel = new CodeLabel("L_FOR_END_" + id);
+        CodeLabel nextLabel = new CodeLabel("L_FOR_NEXT_" + id);
         loopNextLabel = nextLabel;
         loopEndLabel = endLabel;
 
         SymbolInfo iterInfo = node.getIteratorInfo();
 
-        // ожидаем BinOpNode("..", start, end)
-        ExprNode rangeStart, rangeEnd;
+        int limitSlot = iterInfo.index() + 1;
+
         ExprNode range = node.getRange();
+        ExprNode rangeStart, rangeEnd;
         if (range instanceof BinOpNode bin && bin.getOp().equals("..")) {
             rangeStart = bin.getLeft();
             rangeEnd = bin.getRight();
         } else {
-            // Единственное выражение ->итерируем 0..range
             rangeStart = new NumNode("0");
             rangeEnd = range;
         }
 
+        // i = start
         emitExpr(rangeStart);
         emitStore(iterInfo);
 
+        // limit = end (вычисляем один раз)
+        emitExpr(rangeEnd);
+        add("istore", limitSlot);
+
         add(startLabel);
         emitLoad(iterInfo);
-        emitExpr(rangeEnd);
+        add("iload", limitSlot);
         add("if_icmpgt", endLabel);
 
         emitStmtNode(node.getBody());
@@ -432,28 +447,38 @@ public class JbcCodeGenerator extends CodeGenerator {
     private void emitAnd(BinOpNode node) {
         CodeLabel falseLabel = new CodeLabel("L_AND_FALSE");
         CodeLabel endLabel = new CodeLabel("L_AND_END");
+
         emitExpr(node.getLeft());
         add("ifeq", falseLabel);
+
         emitExpr(node.getRight());
         add("ifeq", falseLabel);
+
         add("iconst_1");
         add("goto", endLabel);
+
         add(falseLabel);
         add("iconst_0");
+
         add(endLabel);
     }
 
     private void emitOr(BinOpNode node) {
         CodeLabel trueLabel = new CodeLabel("L_OR_TRUE");
         CodeLabel endLabel = new CodeLabel("L_OR_END");
+
         emitExpr(node.getLeft());
         add("ifne", trueLabel);
+
         emitExpr(node.getRight());
         add("ifne", trueLabel);
+
         add("iconst_0");
         add("goto", endLabel);
+
         add(trueLabel);
         add("iconst_1");
+
         add(endLabel);
     }
 
@@ -506,7 +531,7 @@ public class JbcCodeGenerator extends CodeGenerator {
             if (argType == null || argType.getBaseType() != TypeDesc.BaseType.STRING) {
                 String convertSig = argType != null && argType.getBaseType() == TypeDesc.BaseType.FLOAT
                         ? "double" : "int";
-                add("invokestatic " + RUNTIME + "#java.lang.String convert(" + convertSig + ")");
+                add("invokestatic " + RUNTIME + "#java.lang.String convert_int(" + convertSig + ")");
             }
 
             add("invokestatic " + RUNTIME + "#void " + name + "(java.lang.String)");
@@ -572,9 +597,25 @@ public class JbcCodeGenerator extends CodeGenerator {
         }
     }
 
+    private void emitContinue() {
+        if (loopNextLabel != null) {
+            add("goto", loopNextLabel);
+        }
+    }
+
+    private void emitBreak() {
+        if (loopEndLabel != null) {
+            add("goto", loopEndLabel);
+        }
+    }
+
+    private int labelCounter = 0;
+
     private void boolValGen(String cmd) {
-        CodeLabel trueLabel = new CodeLabel("L");
-        CodeLabel endLabel = new CodeLabel("L");
+        int id = labelCounter++;
+        CodeLabel trueLabel = new CodeLabel("L_BOOL_TRUE_" + id);
+        CodeLabel endLabel = new CodeLabel("L_BOOL_END_" + id);
+
         add(cmd, trueLabel);
         add("iconst_0");
         add("goto", endLabel);
@@ -582,7 +623,6 @@ public class JbcCodeGenerator extends CodeGenerator {
         add("iconst_1");
         add(endLabel);
     }
-
     // Вспомогательные методы
 
     /**

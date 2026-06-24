@@ -14,6 +14,12 @@ public class SymbolTable {
         this.parent = parent;
 
         this.isGlobalScope = (parent == null);
+
+        if (parent != null) {
+            this.localOffset = parent.localOffset;
+        } else {
+            this.localOffset = 0;
+        }
     }
 
     public SymbolInfo add(String name, TypeDesc type, boolean isMutable) {
@@ -70,9 +76,11 @@ public class SymbolTable {
     }
 
     public SymbolTable getParent() { return parent; }
+
+    public int getLocalOffset() { return localOffset; }
 }
 
-record SymbolInfo(String name, TypeDesc type,boolean isMutable, String kind, Integer index) {
+record SymbolInfo(String name, TypeDesc type,boolean isMutable, String kind, int index) {
     @Override
     public String toString() {
         if ("function".equals(kind)) {

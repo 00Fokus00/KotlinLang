@@ -35,6 +35,9 @@ public class SemanticAnalyzer {
         else if (node instanceof ReturnNode) {
             checkReturn((ReturnNode) node);
         }
+        else if (node instanceof ContinueNode || node instanceof BreakNode) {
+            // просто пропускаем
+        }
         else {
             for (AstNode child : node.getChilds()) analyze(child);
         }
@@ -45,23 +48,89 @@ public class SemanticAnalyzer {
         SymbolTable oldScope = currentScope;
         currentScope = new SymbolTable(oldScope);
 
-        if (node instanceof WhileNode whileNode) {
-            TypeDesc condType = inferType(whileNode.getCondition());
+        if (node instanceof ForNode forNode) {
+            String varName = forNode.getIteratorName();
 
-            if (!condType.equals(TypeDesc.BOOL)) {
-                throw new SemanticException("Условие в 'while' должно быть Boolean, а не " + condType);
-            }
-            analyze(whileNode.getBody());
-        } else if (node instanceof ForNode forNode) {
-            SymbolInfo iterInfo = currentScope.add(forNode.getIteratorName(), TypeDesc.INT, false);
-            forNode.setIteratorInfo(iterInfo);
-            TypeDesc intType = TypeDesc.INT;
-            currentScope.add(forNode.getIteratorName(), intType, false);
+            SymbolTable rangeScope = currentScope;
+            currentScope = oldScope;
             inferType(forNode.getRange());
+            currentScope = rangeScope;
+
+            SymbolInfo info = currentScope.add(varName, TypeDesc.INT, false);
+            forNode.setIteratorInfo(info);
+
+            if (forNode.getRange() instanceof BinOpNode rangeOp) {
+                if (exprType(rangeOp.getLeft()) != TypeDesc.INT || exprType(rangeOp.getRight()) != TypeDesc.INT) {
+                    throw new SemanticException("Границы диапазона в цикле for должны быть типа Int.");
+                }
+            } else {
+                if (exprType(forNode.getRange()) != TypeDesc.INT) {
+                    throw new SemanticException("Выражение диапазона в цикле for должно возвращать целочисленный тип.");
+                }
+            }
+
             analyze(forNode.getBody());
+        }
+        else if (node instanceof WhileNode whileNode) {
+            analyze(whileNode.getCondition());
+
+            if (exprType(whileNode.getCondition()) != TypeDesc.BOOL) {
+                throw new SemanticException("Условие в цикле while должно иметь тип Boolean.");
+            }
+
+            analyze(whileNode.getBody());
         }
 
         currentScope = oldScope;
+    }
+
+    private TypeDesc exprType(AstNode node) {
+        if (node instanceof NumNode num) {
+            return num.getValue().contains(".") ? TypeDesc.FLOAT : TypeDesc.INT;
+        }
+        if (node instanceof StringNode) {
+            return TypeDesc.STRING;
+        }
+        if (node instanceof BoolNode) {
+            return TypeDesc.BOOL;
+        }
+        if (node instanceof IdentNode ident) {
+            SymbolInfo info = currentScope.resolve(ident.getName());
+            if (info != null) {
+                return info.type();
+            }
+            throw new SemanticException("Переменная '" + ident.getName() + "' не объявлена.");
+        }
+        if (node instanceof BinOpNode binOp) {
+            TypeDesc lt = exprType(binOp.getLeft());
+            TypeDesc rt = exprType(binOp.getRight());
+            if (binOp.getOp().equals("+") && (lt == TypeDesc.STRING || rt == TypeDesc.STRING)) {
+                return TypeDesc.STRING;
+            }
+            if (binOp.getOp().matches("==|!=|<|>|<=|>=|&&|\\|\\|")) {
+                return TypeDesc.BOOL;
+            }
+            if (lt == TypeDesc.FLOAT || rt == TypeDesc.FLOAT) {
+                return TypeDesc.FLOAT;
+            }
+            return lt;
+        }
+        if (node instanceof UnaryOpNode unaryOp) {
+            String op = unaryOp.getOp();
+            TypeDesc targetType = exprType(unaryOp.getTarget());
+            if (op.equals("!")) {
+                return TypeDesc.BOOL;
+            }
+            return targetType;
+        }
+        if (node instanceof CallNode call) {
+            SymbolInfo info = currentScope.resolve(call.getName());
+            if (info != null && info.type().getBaseType() == TypeDesc.BaseType.FUNCTION) {
+                return info.type().getReturnType();
+            }
+            return TypeDesc.INT;
+        }
+        return TypeDesc.INT;
     }
 
     private void checkIf(IfNode node) {
@@ -191,6 +260,8 @@ public class SemanticAnalyzer {
 
         analyze(node.getBody());
 
+        node.setFuncScope(currentScope);
+
         currentScope = oldScope;
         currentExpectedReturnType = oldReturnType;
     }
@@ -269,8 +340,8 @@ public class SemanticAnalyzer {
 
     // Вывод типа выражения
     private TypeDesc inferType(AstNode node) {
-        if (node instanceof NumNode) {
-            return  node.toString().contains(".") ? TypeDesc.FLOAT : TypeDesc.INT;
+        if (node instanceof NumNode num) {
+            return num.getValue().contains(".") ? TypeDesc.FLOAT : TypeDesc.INT;
         }
         if (node instanceof StringNode) return TypeDesc.STRING;
         if (node instanceof BoolNode) return TypeDesc.BOOL;
@@ -291,6 +362,13 @@ public class SemanticAnalyzer {
             TypeDesc left = inferType(binOp.getLeft());
             TypeDesc right = inferType(binOp.getRight());
             String op = binOp.getOp();
+
+            if (op.equals("&&") || op.equals("||")) {
+                if (!left.equals(TypeDesc.BOOL) || !right.equals(TypeDesc.BOOL)) {
+                    throw new SemanticException("Операнды логической операции " + op + " должны иметь тип Boolean");
+                }
+                return TypeDesc.BOOL;
+            }
 
             // Арифметические операции (+, -, *, /)
             if (isArithmetic(op)) {

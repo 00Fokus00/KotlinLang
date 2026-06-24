@@ -7,14 +7,10 @@ public class CodeGenerator {
 
     public static class CodeLabel {
         private final String prefix;
-        Integer index = null;           // заполняется в getCode()
+        Integer index = null; // заполняется в getCode()
 
         public CodeLabel(String prefix) {
             this.prefix = prefix;
-        }
-
-        public CodeLabel() {
-            this("L");
         }
 
         @Override
@@ -24,10 +20,10 @@ public class CodeGenerator {
     }
 
     private static class CodeLine {
-        final String instruction; // null если строка — только метка
-        final Object[] params;      // аргументы инструкции
-        final CodeLabel label;       // метка перед строкой (может быть null)
-        final String indent;      // отступ, зафиксированный в момент add()
+        final String instruction;
+        final Object[] params; // аргументы инструкции
+        final CodeLabel label; // метка перед строкой
+        final String indent; // отступ
 
         CodeLine(String instruction, Object[] params, CodeLabel label, String indent) {
             this.instruction = instruction;
@@ -40,7 +36,7 @@ public class CodeGenerator {
             StringBuilder sb = new StringBuilder();
 
             if (label != null) {
-                // Метка печатается с меньшим отступом — "выступает" влево
+                // Метка печатается с меньшим отступом
                 String labelIndent = indent.length() >= 2 ? indent.substring(2) : "";
                 sb.append(labelIndent).append(label).append(":");
                 if (instruction != null) sb.append("  ");

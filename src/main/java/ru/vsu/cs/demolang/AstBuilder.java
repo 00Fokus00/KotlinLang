@@ -22,7 +22,17 @@ public class AstBuilder extends KotlinLangBaseVisitor<AstNode> {
 
     @Override
     public AstNode visitStmt(KotlinLangParser.StmtContext ctx) {
-        // Игнорируем ';'
+        // break / continue
+        if (ctx.getChildCount() >= 1) {
+            String text = ctx.getChild(0).getText();
+            if (text.equals("break")) {
+                return new BreakNode();
+            }
+            if (text.equals("continue")) {
+                return new ContinueNode();
+            }
+        }
+        // игнорируем ';'
         return visit(ctx.getChild(0));
     }
 
